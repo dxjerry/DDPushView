@@ -1,6 +1,0 @@
-framework module DDPushView {
-  umbrella header "DDPushView-umbrella.h"
-
-  export *
-  module * { export * }
-}
