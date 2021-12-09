@@ -53,7 +53,7 @@
     DDPushView *pushview = [[DDPushView alloc]init];
     pushview.title = @"这里设置标题";
     pushview.mainview = showview;//已经设置好的显示视图
-    [pushview PushAlertView];//弹出动画
+    [pushview PushOutView];//弹出动画
     //通过block获得返回值
     pushview.comfirm = ^(NSInteger index){
         NSLog(@"%ld",(long)index);

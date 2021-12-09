@@ -21,5 +21,5 @@ typedef void(^ AlertComfirm)(NSInteger index);
 @property(nonatomic,strong)UILabel *labeltitle;
 @property(nonatomic,strong)UIView *viewline;
 
--(void)PushAlertView;
+-(void)PushOutView;
 @end

@@ -26,14 +26,14 @@ isBangsScreen; \
 @interface DDPushView()<UIGestureRecognizerDelegate>
 {
     float startY;
-    CGPoint startGCenter;
+    CGPoint startCenter;
     
     CGRect rectShow;
     CGRect rectHide;
     
 }
 /** 弹窗 */
-@property(nonatomic,strong) UIView *alertView;
+@property(nonatomic,strong) UIView *PView;
 
 @end
 @implementation DDPushView
@@ -43,7 +43,7 @@ isBangsScreen; \
         self.frame = [UIScreen mainScreen].bounds;
         self.backgroundColor = RGB_COLOR_ALPHA(0, 0, 0, 0.5);
         
-        startGCenter = CGPointMake(0, 0);
+        startCenter = CGPointMake(0, 0);
         
         rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
         
@@ -52,39 +52,39 @@ isBangsScreen; \
         [buttoncancel addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:buttoncancel];
         
-        self.alertView = [[UIView alloc]init];
-        self.alertView.backgroundColor = [UIColor whiteColor];
-        self.alertView.layer.cornerRadius = 10.0;
-        self.alertView.layer.shouldRasterize = YES;
-        self.alertView.layer.rasterizationScale = UIScreen.mainScreen.scale;
+        self.PView = [[UIView alloc]init];
+        self.PView.backgroundColor = [UIColor whiteColor];
+        self.PView.layer.cornerRadius = 10.0;
+        self.PView.layer.shouldRasterize = YES;
+        self.PView.layer.rasterizationScale = UIScreen.mainScreen.scale;
         //计算高度
-        self.alertView.frame = rectHide;
-        //self.alertView.contentSize=CGSizeMake(WIN_WIDTH, WIN_HEIGHT*3);
-        [self addSubview:self.alertView];
+        self.PView.frame = rectHide;
+        //self.PView.contentSize=CGSizeMake(WIN_WIDTH, WIN_HEIGHT*3);
+        [self addSubview:self.PView];
         
         
-        UIImageView *buttonX=[[UIImageView alloc]initWithFrame:CGRectMake(self.alertView.frame.size.width-15-16, 15, 16, 16)];
+        UIImageView *buttonX=[[UIImageView alloc]initWithFrame:CGRectMake(self.PView.frame.size.width-15-16, 15, 16, 16)];
         NSBundle *imageBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[DDPushView class]] pathForResource:@"DDPushView" ofType:@"bundle"]];
         buttonX.image=[UIImage imageWithContentsOfFile:[imageBundle pathForResource:@"btn_guanbi" ofType:@"png"]];
         UITapGestureRecognizer *Tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cancel)];
         buttonX.userInteractionEnabled = YES;
         [buttonX addGestureRecognizer:Tap];
-        [self.alertView addSubview:buttonX];
+        [self.PView addSubview:buttonX];
         
-        self.labeltitle=[[UILabel alloc]initWithFrame:CGRectMake(20+15, 20-7.5, self.alertView.frame.size.width-2*(20+15), 30)];
+        self.labeltitle=[[UILabel alloc]initWithFrame:CGRectMake(20+15, 20-7.5, self.PView.frame.size.width-2*(20+15), 30)];
         self.labeltitle.textAlignment=NSTextAlignmentCenter;
         self.labeltitle.font=[UIFont fontWithName:@"Helvetica-Bold" size:20];
         self.labeltitle.textColor=RGB_COLOR(51, 51, 51);
-        [self.alertView addSubview:self.labeltitle];
+        [self.PView addSubview:self.labeltitle];
         
-        self.viewline=[[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.labeltitle.frame)+10, self.alertView.frame.size.width, 1)];
+        self.viewline=[[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.labeltitle.frame)+10, self.PView.frame.size.width, 1)];
         self.viewline.backgroundColor=RGB_COLOR(243, 243, 243);
-        [self.alertView addSubview:self.viewline];
+        [self.PView addSubview:self.viewline];
         
         
-        UIPanGestureRecognizer * alertViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
-        alertViewpan.delegate=self;
-        [self.alertView addGestureRecognizer:alertViewpan];
+        UIPanGestureRecognizer * PViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
+        PViewpan.delegate=self;
+        [self.PView addGestureRecognizer:PViewpan];
     }
     return self;
 }
@@ -96,7 +96,7 @@ isBangsScreen; \
     rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-mainview.frame.size.height-(20-7.5+30+1), WIN_WIDTH, WIN_HEIGHT);
     
     mainview.frame = CGRectMake(0, CGRectGetMaxY(self.viewline.frame), mainview.frame.size.width, mainview.frame.size.height);
-    [self.alertView addSubview:mainview];
+    [self.PView addSubview:mainview];
 }
 
 -(void)setTitle:(NSString *)title{
@@ -106,18 +106,28 @@ isBangsScreen; \
 
 
 #pragma mark - 弹出
--(void)PushAlertView
+-(void)PushOutView
 {
+    //弹出时判断有title则显示标题和横线，否则不显示
+    if ((!self.title)||[self.title isEqualToString:@""]){
+        self.labeltitle.hidden = YES;
+        self.viewline.hidden = YES;
+    }
+    else{
+        self.labeltitle.hidden = NO;
+        self.viewline.hidden = NO;
+    }
+    
     UIWindow *rootWindow = [UIApplication sharedApplication].windows[0];
     [rootWindow addSubview:self];
-    [self creatShowAnimation];
+    [self PushOutAnimation];
 }
 
--(void)creatShowAnimation
+-(void)PushOutAnimation
 {
-    self.alertView.frame = rectHide;
+    self.PView.frame = rectHide;
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.alertView.frame = self->rectShow;
+        self.PView.frame = self->rectShow;
     } completion:^(BOOL finished) {
         
     }];
@@ -129,21 +139,21 @@ isBangsScreen; \
     if (self.comfirm) {
         self.comfirm(1);
     }
-    [self removeAlertView];
+    [self removePView];
 }
 //取消并消除弹窗（block返回0）
 -(void)cancel{
     if (self.comfirm) {
         self.comfirm(0);
     }
-    [self removeAlertView];
+    [self removePView];
 }
-//-(void)alertViewTap{
+//-(void)PViewTap{
 //
 //}
--(void)removeAlertView{
+-(void)removePView{
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.alertView.frame = self->rectHide;
+        self.PView.frame = self->rectHide;
         
         self.backgroundColor = [UIColor clearColor];
         
@@ -154,26 +164,26 @@ isBangsScreen; \
 - (void)Alertpan:(UIPanGestureRecognizer *)pan {
     if (pan.state == UIGestureRecognizerStateBegan) {
         //记录起始位置
-        startY = self.alertView.frame.origin.y;
-        startGCenter = [pan locationInView:self];
+        startY = self.PView.frame.origin.y;
+        startCenter = [pan locationInView:self];
         return;
     }
     
     CGPoint GCenter = [pan locationInView:self];
     
-    float startyy = startGCenter.y;
+    float startyy = startCenter.y;
     float nowyy = GCenter.y;
     
     if (nowyy>=startyy){
-        self.alertView.frame = CGRectMake(0, startY+(nowyy-startyy), WIN_WIDTH, WIN_HEIGHT);
+        self.PView.frame = CGRectMake(0, startY+(nowyy-startyy), WIN_WIDTH, WIN_HEIGHT);
         
         if (pan.state == UIGestureRecognizerStateEnded){
-            if (((self.alertView.frame.origin.y)-rectShow.origin.y)>(WIN_HEIGHT*0.18)){
+            if (((self.PView.frame.origin.y)-rectShow.origin.y)>(WIN_HEIGHT*0.18)){
                 [self cancel];
             }
             else{
                 [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-                    self.alertView.frame = self->rectShow;
+                    self.PView.frame = self->rectShow;
                 } completion:^(BOOL finished) {
                     
                 }];
