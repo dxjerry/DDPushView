@@ -1,0 +1,23 @@
+{
+  "name": "DDPushView",
+  "version": "0.1.1",
+  "summary": "A short description of DDPushView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/dxjerry/DDPushView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "dxjerry": "dxjerry@sina.com"
+  },
+  "source": {
+    "git": "https://github.com/dxjerry/DDPushView.git",
+    "tag": "0.1.1"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "DDPushView/Classes/**/*",
+  "resources": "DDPushView/Assets/DDPushView.bundle"
+}
