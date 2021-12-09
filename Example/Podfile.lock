@@ -1,0 +1,16 @@
+PODS:
+  - DDPushView (0.1.1)
+
+DEPENDENCIES:
+  - DDPushView (from `../`)
+
+EXTERNAL SOURCES:
+  DDPushView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  DDPushView: 37a762625f64b8f3c1842a4a4fa3b25d61cf36cc
+
+PODFILE CHECKSUM: 86f5d97c566172cf40ae91603e77305852d4bab3
+
+COCOAPODS: 1.11.2
