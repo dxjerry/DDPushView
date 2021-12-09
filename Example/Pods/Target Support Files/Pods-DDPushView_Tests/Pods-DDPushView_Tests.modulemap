@@ -1,6 +1,0 @@
-framework module Pods_DDPushView_Tests {
-  umbrella header "Pods-DDPushView_Tests-umbrella.h"
-
-  export *
-  module * { export * }
-}
