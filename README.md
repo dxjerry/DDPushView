@@ -20,8 +20,8 @@ DDPushView *pushview = [[DDPushView alloc]init];
 //设置弹出框标题（为空或不填则隐藏标题栏）
 pushview.title = @"这里设置标题";
     
-//设置showview为弹出框内要显示的视图（弹出框自动匹配高度）
-pushview.mainview = showview;
+//设置view为弹出框内要显示的视图（自动匹配高度）
+pushview.mainview = view;
     
 //弹出动画
 [pushview PushOutView];
