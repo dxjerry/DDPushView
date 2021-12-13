@@ -5,6 +5,12 @@
 [![License](https://img.shields.io/cocoapods/l/DDPushView.svg?style=flat)](https://cocoapods.org/pods/DDPushView)
 [![Platform](https://img.shields.io/cocoapods/p/DDPushView.svg?style=flat)](https://cocoapods.org/pods/DDPushView)
 
+## 导入
+
+```ruby
+pod 'DDPushView',:git =>"https://github.com/dxjerry/DDPushView.git"
+```
+
 ## 使用
 
 ```objc
@@ -24,12 +30,6 @@ pushview.mainview = showview;
 pushview.comfirm = ^(NSInteger index){
     NSLog(@"%ld",(long)index);
 };
-```
-
-## 导入
-
-```ruby
-pod 'DDPushView',:git =>"https://github.com/dxjerry/DDPushView.git"
 ```
 
 ## Author
