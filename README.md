@@ -5,16 +5,28 @@
 [![License](https://img.shields.io/cocoapods/l/DDPushView.svg?style=flat)](https://cocoapods.org/pods/DDPushView)
 [![Platform](https://img.shields.io/cocoapods/p/DDPushView.svg?style=flat)](https://cocoapods.org/pods/DDPushView)
 
-## Example
+## 使用
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+```objc
+//初始化
+DDPushView *pushview = [[DDPushView alloc]init];
+    
+//设置弹出框标题（为空或不填则隐藏标题栏）
+pushview.title = @"这里设置标题";
+    
+//设置showview为弹出框内要显示的视图（弹出框自动匹配高度）
+pushview.mainview = showview;
+    
+//弹出动画
+[pushview PushOutView];
+    
+//通过block获得返回值
+pushview.comfirm = ^(NSInteger index){
+    NSLog(@"%ld",(long)index);
+};
+```
 
-## Requirements
-
-## Installation
-
-DDPushView is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+## 导入
 
 ```ruby
 pod 'DDPushView',:git =>"https://github.com/dxjerry/DDPushView.git"
