@@ -105,7 +105,6 @@ isBangsScreen; \
 }
 
 
-
 #pragma mark - 弹出
 -(void)PushOutView
 {

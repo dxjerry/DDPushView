@@ -34,7 +34,9 @@ pushview.comfirm = ^(NSInteger index){
 //设置弹出的方向，目前支持：1屏幕顶部向下弹出，2屏幕底部向上弹出
 pushview.direction = 1;
 
-支持用手势拖拽方式收回弹出框
+//支持用手势拖拽方式收回弹出框
+//手势拖动弹出框时，停止手势时是展开还是缩回的决断距离（可不设置，默认为屏幕高度的0.18）
+pushview.height_PanGesture = WIN_HEIGHT*0.5;
 ```
 
 ## Author

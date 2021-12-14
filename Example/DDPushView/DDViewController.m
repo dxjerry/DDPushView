@@ -118,6 +118,7 @@
         pushview.direction = 2;
     }
     else{}
+    //pushview.height_PanGesture = WIN_HEIGHT*0.5;//手势拖动弹出框时，停止手势时是展开还是缩回的决断距离（可不设置，默认为屏幕高度的0.18）
     [pushview PushOutView];//弹出动画
     //通过block获得返回值
     pushview.comfirm = ^(NSInteger index){
