@@ -30,6 +30,13 @@ pushview.mainview = view;
 pushview.comfirm = ^(NSInteger index){
     NSLog(@"%ld",(long)index);
 };
+
+//设置弹出的方向，目前支持：1屏幕顶部向下弹出，2屏幕底部向上弹出
+pushview.direction = 1;
+
+
+
+支持用手势拖拽方式收回弹出框
 ```
 
 ## Author

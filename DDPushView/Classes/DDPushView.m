@@ -21,7 +21,11 @@ isBangsScreen = window.safeAreaInsets.bottom > 0; \
 } \
 isBangsScreen; \
 })
+
+#define Height_StatusBar (((IS_IPHONE_X ) == (YES))?(44.0): (20.0))
 #define Height_Indicator (((IS_IPHONE_X ) == (YES))?(34.0): (0.0))
+#define Height_NavBar (((IS_IPHONE_X ) == (YES))?(88.0): (64.0))
+#define Height_TabBar (((IS_IPHONE_X ) == (YES))?(83.0): (49.0+14))
 
 @interface DDPushView()<UIGestureRecognizerDelegate>
 {
@@ -32,8 +36,9 @@ isBangsScreen; \
     CGRect rectHide;
     
 }
-/** 弹窗 */
-@property(nonatomic,strong) UIView *PView;
+
+@property(nonatomic,strong) UIView *PushView;//弹出的白色框背景视图
+@property(nonatomic,strong) UIView *ShowView;//显示区域的视图（设置为上下弹出时，用来让出刘海和底部黑条区域）
 
 @end
 @implementation DDPushView
@@ -45,58 +50,49 @@ isBangsScreen; \
         
         startCenter = CGPointMake(0, 0);
         
-        rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
-        
         UIButton *buttoncancel=[[UIButton alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
         buttoncancel.backgroundColor=[UIColor clearColor];
         [buttoncancel addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:buttoncancel];
         
-        self.PView = [[UIView alloc]init];
-        self.PView.backgroundColor = [UIColor whiteColor];
-        self.PView.layer.cornerRadius = 10.0;
-        self.PView.layer.shouldRasterize = YES;
-        self.PView.layer.rasterizationScale = UIScreen.mainScreen.scale;
-        //计算高度
-        self.PView.frame = rectHide;
-        //self.PView.contentSize=CGSizeMake(WIN_WIDTH, WIN_HEIGHT*3);
-        [self addSubview:self.PView];
+        self.PushView = [[UIView alloc]init];
+        self.PushView.backgroundColor = [UIColor whiteColor];
         
         
-        UIImageView *buttonX=[[UIImageView alloc]initWithFrame:CGRectMake(self.PView.frame.size.width-15-16, 15, 16, 16)];
+        self.ShowView = [[UIView alloc]init];
+        self.ShowView.backgroundColor = self.PushView.backgroundColor;
+        [self.PushView addSubview:self.ShowView];
+        
+        
+        UIImageView *buttonX=[[UIImageView alloc]initWithFrame:CGRectMake(WIN_WIDTH-15-16, (50-16)/2, 16, 16)];
         NSBundle *imageBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[DDPushView class]] pathForResource:@"DDPushView" ofType:@"bundle"]];
         buttonX.image=[UIImage imageWithContentsOfFile:[imageBundle pathForResource:@"btn_guanbi" ofType:@"png"]];
         UITapGestureRecognizer *Tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cancel)];
         buttonX.userInteractionEnabled = YES;
         [buttonX addGestureRecognizer:Tap];
-        [self.PView addSubview:buttonX];
+        [self.ShowView addSubview:buttonX];
         
-        self.labeltitle=[[UILabel alloc]initWithFrame:CGRectMake(20+15, 20-7.5, self.PView.frame.size.width-2*(20+15), 30)];
+        self.labeltitle=[[UILabel alloc]initWithFrame:CGRectMake(20+15, 10, WIN_WIDTH-2*(20+15), 30)];
         self.labeltitle.textAlignment=NSTextAlignmentCenter;
         self.labeltitle.font=[UIFont fontWithName:@"Helvetica-Bold" size:20];
         self.labeltitle.textColor=RGB_COLOR(51, 51, 51);
-        [self.PView addSubview:self.labeltitle];
+        [self.ShowView addSubview:self.labeltitle];
         
-        self.viewline=[[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.labeltitle.frame)+10, self.PView.frame.size.width, 1)];
+        self.viewline=[[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.labeltitle.frame)+10, WIN_WIDTH, 1)];
         self.viewline.backgroundColor=RGB_COLOR(243, 243, 243);
-        [self.PView addSubview:self.viewline];
+        [self.ShowView addSubview:self.viewline];
         
         
-        UIPanGestureRecognizer * PViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
-        PViewpan.delegate=self;
-        [self.PView addGestureRecognizer:PViewpan];
+        UIPanGestureRecognizer * PushViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
+        PushViewpan.delegate=self;
+        [self.PushView addGestureRecognizer:PushViewpan];
     }
     return self;
 }
 
 -(void)setMainview:(UIView *)mainview{
     _mainview = mainview;
-    
-    //确定弹出时的位置
-    rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-mainview.frame.size.height-(20-7.5+30+1), WIN_WIDTH, WIN_HEIGHT);
-    
-    mainview.frame = CGRectMake(0, CGRectGetMaxY(self.viewline.frame), mainview.frame.size.width, mainview.frame.size.height);
-    [self.PView addSubview:mainview];
+    [self.ShowView addSubview:self.mainview];
 }
 
 -(void)setTitle:(NSString *)title{
@@ -104,30 +100,72 @@ isBangsScreen; \
     self.labeltitle.text=title;
 }
 
+-(void)setDirection:(NSInteger)direction{
+    _direction = direction;
+}
+
+
 
 #pragma mark - 弹出
 -(void)PushOutView
 {
+    //判断是否设置了主视图
+    if (!self.mainview){
+        NSLog(@"未设置要显示的视图");
+        return;
+    }
+    
+    
+    float height_title = 0;//用来记录标题栏高度（若隐藏标题栏时为0）
     //弹出时判断有title则显示标题和横线，否则不显示
     if ((!self.title)||[self.title isEqualToString:@""]){
         self.labeltitle.hidden = YES;
         self.viewline.hidden = YES;
+        
+        self.mainview.frame = CGRectMake(0, 0, self.mainview.frame.size.width, self.mainview.frame.size.height);
+        height_title = 0;
     }
     else{
         self.labeltitle.hidden = NO;
         self.viewline.hidden = NO;
+        
+        self.mainview.frame = CGRectMake(0, CGRectGetMaxY(self.viewline.frame), self.mainview.frame.size.width, self.mainview.frame.size.height);
+        height_title = 10+30+10+1;
     }
+    
+    
+    //判断direction是否合法，并确定弹出时的位置
+    if (self.direction==1){
+        rectShow = CGRectMake(0, -(WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title), WIN_WIDTH, WIN_HEIGHT);
+        rectHide = CGRectMake(0, -WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
+        self.ShowView.frame = CGRectMake(0, WIN_HEIGHT-(self.mainview.frame.size.height+height_title), WIN_WIDTH, self.mainview.frame.size.height+height_title);
+    }
+    else if (self.direction==2){
+        rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title, WIN_WIDTH, WIN_HEIGHT);
+        rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
+        self.ShowView.frame = CGRectMake(0, 0, WIN_WIDTH, self.mainview.frame.size.height+height_title);
+    }
+    else{
+        NSLog(@"设置方向错误，请设置：1屏幕顶部向下弹出，2屏幕底部向上弹出");
+        return;
+    }
+    
+    //动画开始前，先将视图置于隐藏位置
+    self.PushView.frame = rectHide;
+    [self addSubview:self.PushView];
+    
     
     UIWindow *rootWindow = [UIApplication sharedApplication].windows[0];
     [rootWindow addSubview:self];
     [self PushOutAnimation];
 }
 
+//开始动画
 -(void)PushOutAnimation
 {
-    self.PView.frame = rectHide;
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.PView.frame = self->rectShow;
+    self.PushView.frame = rectHide;
+    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+        self.PushView.frame = self->rectShow;
     } completion:^(BOOL finished) {
         
     }];
@@ -139,32 +177,40 @@ isBangsScreen; \
     if (self.comfirm) {
         self.comfirm(1);
     }
-    [self removePView];
+    [self removePushView];
 }
 //取消并消除弹窗（block返回0）
 -(void)cancel{
     if (self.comfirm) {
         self.comfirm(0);
     }
-    [self removePView];
+    [self removePushView];
 }
-//-(void)PViewTap{
+//-(void)PushViewTap{
 //
 //}
--(void)removePView{
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.PView.frame = self->rectHide;
+-(void)removePushView{
+    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+        self.PushView.frame = self->rectHide;
         
         self.backgroundColor = [UIColor clearColor];
         
     } completion:^(BOOL finished) {
+        [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
         [self removeFromSuperview];
     }];
 }
+
+
+//支持用手势拖曳方式消除弹窗
 - (void)Alertpan:(UIPanGestureRecognizer *)pan {
+    if(self.height_PanGesture==0){
+        self.height_PanGesture = WIN_HEIGHT*0.18;
+    }
+    
     if (pan.state == UIGestureRecognizerStateBegan) {
         //记录起始位置
-        startY = self.PView.frame.origin.y;
+        startY = self.PushView.frame.origin.y;
         startCenter = [pan locationInView:self];
         return;
     }
@@ -174,21 +220,45 @@ isBangsScreen; \
     float startyy = startCenter.y;
     float nowyy = GCenter.y;
     
-    if (nowyy>=startyy){
-        self.PView.frame = CGRectMake(0, startY+(nowyy-startyy), WIN_WIDTH, WIN_HEIGHT);
-        
-        if (pan.state == UIGestureRecognizerStateEnded){
-            if (((self.PView.frame.origin.y)-rectShow.origin.y)>(WIN_HEIGHT*0.18)){
-                [self cancel];
-            }
-            else{
-                [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-                    self.PView.frame = self->rectShow;
-                } completion:^(BOOL finished) {
-                    
-                }];
+    if (self.direction==1){
+        if (nowyy<=startyy){
+            self.PushView.frame = CGRectMake(0, startY-(startyy-nowyy), WIN_WIDTH, WIN_HEIGHT);
+            
+            if (pan.state == UIGestureRecognizerStateEnded){
+                if ((rectShow.origin.y-(self.PushView.frame.origin.y))>self.height_PanGesture){
+                    [self cancel];
+                }
+                else{
+                    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+                        self.PushView.frame = self->rectShow;
+                    } completion:^(BOOL finished) {
+                        
+                    }];
+                }
             }
         }
+    }
+    else if (self.direction==2){
+        if (nowyy>=startyy){
+            self.PushView.frame = CGRectMake(0, startY+(nowyy-startyy), WIN_WIDTH, WIN_HEIGHT);
+            
+            if (pan.state == UIGestureRecognizerStateEnded){
+                if (((self.PushView.frame.origin.y)-rectShow.origin.y)>self.height_PanGesture){
+                    [self cancel];
+                }
+                else{
+                    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+                        self.PushView.frame = self->rectShow;
+                    } completion:^(BOOL finished) {
+                        
+                    }];
+                }
+            }
+        }
+    }
+    else{
+        NSLog(@"设置方向错误，请设置：1屏幕顶部向下弹出，2屏幕底部向上弹出");
+        return;
     }
 }
 @end
