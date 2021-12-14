@@ -30,6 +30,8 @@ pushview.mainview = view;
 pushview.comfirm = ^(NSInteger index){
     NSLog(@"%ld",(long)index);
 };
+
+支持用手势拖曳方式收回弹出框
 ```
 
 ## Author
