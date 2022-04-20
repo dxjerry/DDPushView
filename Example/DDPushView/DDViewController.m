@@ -110,11 +110,11 @@
         pushview.direction = 2;
     }
     else if (sender.tag==103){
-        pushview.title = @"";//或不设置
+        pushview.title = @"";//不设置标题，则默认隐藏标题栏
         pushview.direction = 1;
     }
     else if (sender.tag==104){
-        pushview.title = @"";//或不设置
+        pushview.title = @"";//不设置标题，则默认隐藏标题栏
         pushview.direction = 2;
     }
     else{}

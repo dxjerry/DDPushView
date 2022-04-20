@@ -15,7 +15,7 @@ typedef void(^ AlertComfirm)(NSInteger index);
 @property(nonatomic,copy)UIView *mainview;//主视图
 @property(nonatomic,copy)NSString *title;//标题（可不设置，若为空则隐藏标题栏）
 @property(nonatomic,assign)NSInteger direction;//弹出的方向（1屏幕顶部向下弹出，2屏幕底部向上弹出）
-//手势
+@property(nonatomic,assign)float time_animation;//弹出、收回动画的时间，单位秒（可不设置，默认为0.8秒）
 @property(nonatomic,assign)float height_PanGesture;//手势拖动弹出框时，停止手势时是展开还是缩回的决断距离（可不设置，默认为屏幕高度的0.18）
 
 //标题栏控件，可以自由修改

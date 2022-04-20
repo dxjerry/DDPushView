@@ -134,12 +134,12 @@ isBangsScreen; \
     
     
     //判断direction是否合法，并确定弹出时的位置
-    if (self.direction==1){
+    if (self.direction == 1){
         rectShow = CGRectMake(0, -(WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title), WIN_WIDTH, WIN_HEIGHT);
         rectHide = CGRectMake(0, -WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
         self.ShowView.frame = CGRectMake(0, WIN_HEIGHT-(self.mainview.frame.size.height+height_title), WIN_WIDTH, self.mainview.frame.size.height+height_title);
     }
-    else if (self.direction==2){
+    else if (self.direction == 2){
         rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title, WIN_WIDTH, WIN_HEIGHT);
         rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
         self.ShowView.frame = CGRectMake(0, 0, WIN_WIDTH, self.mainview.frame.size.height+height_title);
@@ -154,6 +154,11 @@ isBangsScreen; \
     [self addSubview:self.PushView];
     
     
+    //判断是否设置了动画时间
+    if (self.time_animation == 0){
+        self.time_animation = 0.8;
+    }
+    
     UIWindow *rootWindow = [UIApplication sharedApplication].windows[0];
     [rootWindow addSubview:self];
     [self PushOutAnimation];
@@ -163,7 +168,7 @@ isBangsScreen; \
 -(void)PushOutAnimation
 {
     self.PushView.frame = rectHide;
-    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+    [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         self.PushView.frame = self->rectShow;
     } completion:^(BOOL finished) {
         
@@ -189,7 +194,7 @@ isBangsScreen; \
 //
 //}
 -(void)removePushView{
-    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+    [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         self.PushView.frame = self->rectHide;
         
         self.backgroundColor = [UIColor clearColor];
@@ -228,7 +233,7 @@ isBangsScreen; \
                     [self cancel];
                 }
                 else{
-                    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+                    [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
                         self.PushView.frame = self->rectShow;
                     } completion:^(BOOL finished) {
                         
@@ -246,7 +251,7 @@ isBangsScreen; \
                     [self cancel];
                 }
                 else{
-                    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+                    [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
                         self.PushView.frame = self->rectShow;
                     } completion:^(BOOL finished) {
                         
