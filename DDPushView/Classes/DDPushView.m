@@ -39,6 +39,7 @@ isBangsScreen; \
 
 @property(nonatomic,strong) UIView *PushView;//弹出的白色框背景视图
 @property(nonatomic,strong) UIView *ShowView;//显示区域的视图（设置为上下弹出时，用来让出刘海和底部黑条区域）
+@property(nonatomic,strong) UIView *viewTopCover;
 
 @end
 @implementation DDPushView
@@ -57,7 +58,8 @@ isBangsScreen; \
         
         self.PushView = [[UIView alloc]init];
         self.PushView.backgroundColor = [UIColor whiteColor];
-        
+        self.PushView.layer.cornerRadius = 8;
+        self.PushView.clipsToBounds = YES;
         
         self.ShowView = [[UIView alloc]init];
         self.ShowView.backgroundColor = self.PushView.backgroundColor;
@@ -67,10 +69,15 @@ isBangsScreen; \
         UIImageView *buttonX=[[UIImageView alloc]initWithFrame:CGRectMake(WIN_WIDTH-15-16, (50-16)/2, 16, 16)];
         NSBundle *imageBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[DDPushView class]] pathForResource:@"DDPushView" ofType:@"bundle"]];
         buttonX.image=[UIImage imageWithContentsOfFile:[imageBundle pathForResource:@"btn_guanbi" ofType:@"png"]];
-        UITapGestureRecognizer *Tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cancel)];
-        buttonX.userInteractionEnabled = YES;
-        [buttonX addGestureRecognizer:Tap];
+//        UITapGestureRecognizer *Tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cancel)];
+//        buttonX.userInteractionEnabled = YES;
+//        [buttonX addGestureRecognizer:Tap];
         [self.ShowView addSubview:buttonX];
+        
+        UIButton *buttonXcover = [[UIButton alloc]initWithFrame:CGRectMake(buttonX.frame.origin.x-5, buttonX.frame.origin.y-5, buttonX.frame.size.width+10, buttonX.frame.size.height+10)];
+        buttonXcover.backgroundColor = [UIColor clearColor];
+        [buttonXcover addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
+        [self.ShowView addSubview:buttonXcover];
         
         self.labeltitle=[[UILabel alloc]initWithFrame:CGRectMake(20+15, 10, WIN_WIDTH-2*(20+15), 30)];
         self.labeltitle.textAlignment=NSTextAlignmentCenter;
@@ -83,9 +90,11 @@ isBangsScreen; \
         [self.ShowView addSubview:self.viewline];
         
         
-        UIPanGestureRecognizer * PushViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
-        PushViewpan.delegate=self;
-        [self.PushView addGestureRecognizer:PushViewpan];
+        self.viewTopCover = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIN_WIDTH-15-16-10, 10+30+10)];
+        self.viewTopCover.backgroundColor = [UIColor clearColor];
+        [self.ShowView addSubview:self.viewTopCover];
+        [self.ShowView bringSubviewToFront:self.viewTopCover];
+        [self.ShowView bringSubviewToFront:buttonX];
     }
     return self;
 }
@@ -102,6 +111,20 @@ isBangsScreen; \
 
 -(void)setDirection:(NSInteger)direction{
     _direction = direction;
+}
+
+-(void)setIsNarrowDrogArea:(BOOL)isNarrowDrogArea{
+    _isNarrowDrogArea = isNarrowDrogArea;
+    
+    UIPanGestureRecognizer * PushViewpan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(Alertpan:)];
+    PushViewpan.delegate=self;
+    
+    if (self.isNarrowDrogArea == YES){
+        [self.viewTopCover addGestureRecognizer:PushViewpan];
+    }
+    else{
+        [self.PushView addGestureRecognizer:PushViewpan];
+    }
 }
 
 
