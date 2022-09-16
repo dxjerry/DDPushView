@@ -25,4 +25,6 @@ typedef void(^ AlertComfirm)(NSInteger index);
 @property(nonatomic,assign)BOOL isNarrowDrogArea;//是否缩小可拖动区域，NO为全屏可拖动，YES仅限标题栏可拖动
 
 -(void)PushOutView;
+-(void)cancel;
+
 @end
