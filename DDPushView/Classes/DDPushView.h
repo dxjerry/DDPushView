@@ -11,6 +11,9 @@ typedef void(^ AlertComfirm)(NSInteger index);
 @interface DDPushView : UIView
 @property(nonatomic,copy) AlertComfirm comfirm;
 
+@property(nonatomic,assign)CGRect rectShow;
+@property(nonatomic,assign)CGRect rectHide;
+
 //需要设置的变量
 @property(nonatomic,copy)UIView *mainview;//主视图
 @property(nonatomic,copy)NSString *title;//标题（可不设置，若为空则隐藏标题栏）

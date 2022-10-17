@@ -31,10 +31,6 @@ isBangsScreen; \
 {
     float startY;
     CGPoint startCenter;
-    
-    CGRect rectShow;
-    CGRect rectHide;
-    
 }
 
 @property(nonatomic,strong) UIView *PushView;//弹出的白色框背景视图
@@ -158,13 +154,13 @@ isBangsScreen; \
     
     //判断direction是否合法，并确定弹出时的位置
     if (self.direction == 1){
-        rectShow = CGRectMake(0, -(WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title), WIN_WIDTH, WIN_HEIGHT);
-        rectHide = CGRectMake(0, -WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
+        self.rectShow = CGRectMake(0, -(WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title), WIN_WIDTH, WIN_HEIGHT);
+        self.rectHide = CGRectMake(0, -WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
         self.ShowView.frame = CGRectMake(0, WIN_HEIGHT-(self.mainview.frame.size.height+height_title), WIN_WIDTH, self.mainview.frame.size.height+height_title);
     }
     else if (self.direction == 2){
-        rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title, WIN_WIDTH, WIN_HEIGHT);
-        rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
+        self.rectShow = CGRectMake(0, WIN_HEIGHT-Height_Indicator-self.mainview.frame.size.height-height_title, WIN_WIDTH, WIN_HEIGHT);
+        self.rectHide = CGRectMake(0, WIN_HEIGHT, WIN_WIDTH, WIN_HEIGHT);
         self.ShowView.frame = CGRectMake(0, 0, WIN_WIDTH, self.mainview.frame.size.height+height_title);
     }
     else{
@@ -173,7 +169,7 @@ isBangsScreen; \
     }
     
     //动画开始前，先将视图置于隐藏位置
-    self.PushView.frame = rectHide;
+    self.PushView.frame = self.rectHide;
     [self addSubview:self.PushView];
     
     
@@ -190,9 +186,10 @@ isBangsScreen; \
 //开始动画
 -(void)PushOutAnimation
 {
-    self.PushView.frame = rectHide;
+    self.PushView.frame = self.rectHide;
+    __weak __typeof(&*self)weakSelf = self;
     [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.PushView.frame = self->rectShow;
+        weakSelf.PushView.frame = weakSelf.rectShow;
     } completion:^(BOOL finished) {
         
     }];
@@ -217,8 +214,9 @@ isBangsScreen; \
 //
 //}
 -(void)removePushView{
+    __weak __typeof(&*self)weakSelf = self;
     [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-        self.PushView.frame = self->rectHide;
+        weakSelf.PushView.frame = weakSelf.rectHide;
         
         self.backgroundColor = [UIColor clearColor];
         
@@ -252,12 +250,13 @@ isBangsScreen; \
             self.PushView.frame = CGRectMake(0, startY-(startyy-nowyy), WIN_WIDTH, WIN_HEIGHT);
             
             if (pan.state == UIGestureRecognizerStateEnded){
-                if ((rectShow.origin.y-(self.PushView.frame.origin.y))>self.height_PanGesture){
+                if ((self.rectShow.origin.y-(self.PushView.frame.origin.y))>self.height_PanGesture){
                     [self cancel];
                 }
                 else{
+                    __weak __typeof(&*self)weakSelf = self;
                     [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-                        self.PushView.frame = self->rectShow;
+                        weakSelf.PushView.frame = weakSelf.rectShow;
                     } completion:^(BOOL finished) {
                         
                     }];
@@ -270,12 +269,13 @@ isBangsScreen; \
             self.PushView.frame = CGRectMake(0, startY+(nowyy-startyy), WIN_WIDTH, WIN_HEIGHT);
             
             if (pan.state == UIGestureRecognizerStateEnded){
-                if (((self.PushView.frame.origin.y)-rectShow.origin.y)>self.height_PanGesture){
+                if (((self.PushView.frame.origin.y)-self.rectShow.origin.y)>self.height_PanGesture){
                     [self cancel];
                 }
                 else{
+                    __weak __typeof(&*self)weakSelf = self;
                     [UIView animateWithDuration:self.time_animation delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-                        self.PushView.frame = self->rectShow;
+                        weakSelf.PushView.frame = weakSelf.rectShow;
                     } completion:^(BOOL finished) {
                         
                     }];
